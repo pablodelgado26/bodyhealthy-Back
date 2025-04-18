@@ -13,12 +13,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Task {
+model User {
   id Int @id @default(autoincrement())
-  descricao String
-  concluida Boolean @default(false) 
+  userName String @unique
+  name String
+  email String @unique
+  password String
+  cellPhone String @unique
+  age Int
 
-  criadaEM DateTime @default(now())
+  sex String?
+  height Float?
+  weight Float?
+  descriptionObjective String?
+  restriction String?
+  conditioning String? 
 
-  @@map("tasks")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
 }
+
+
+  
+  

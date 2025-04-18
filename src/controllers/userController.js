@@ -1,4 +1,4 @@
-import tarefaModel from "../models/tarefaModel.js";
+import tarefaModel from "../models/userModel.js";
 
 class TarefaController {
   getAll = async (req, res) => {
