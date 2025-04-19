@@ -19,12 +19,11 @@ model User {
   name String
   email String @unique
   password String
-  cellPhone String @unique
+  cellPhone BigInt @unique
   age Int
-
-  sex String?
-  height Float?
-  weight Float?
+  sex String
+  height Float
+  weight Float
   descriptionObjective String?
   restriction String?
   conditioning String? 

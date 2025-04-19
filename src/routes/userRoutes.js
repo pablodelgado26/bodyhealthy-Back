@@ -1,8 +1,17 @@
 import express from "express";
-import tarefaController from "../controllers/userController.js";
+import userController from "../controllers/userController.js";
+
 const router = express.Router();
-router.get("/", tarefaController.getAll);
-router.post("/", tarefaController.create);
-router.put("/:id", tarefaController.update);
-router.delete("/:id", tarefaController.delete);
+// Definindo as rotas
+
+// Get buscar todos os usuários
+router.get("/", userController.getAll);
+// Get buscar um usuário pelo id
+router.get("/:id", userController.getById);
+// Post criar um usuário
+router.post("/", userController.create);
+// Put atualizar um usuário
+router.put("/:id", userController.update);
+// Delete deletar um usuário
+router.delete("/:id", userController.delete);
 export default router;

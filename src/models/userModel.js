@@ -1,27 +1,51 @@
 import prisma from "../../prisma/client.js";
 
-class TarefaModel {
+class UserModel {
   getAll = async () => {
-    return await prisma.task.findMany();
+    return await prisma.user.findMany();
   }
 
-  create = async (descricao) => {
-    return await prisma.task.create({
-      data: {
-        descricao: descricao,
-      },
-    })
-  };
+  getById = async (id) => {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id },
+      });
+      return user;
+    } catch (error) {
+      console.log("Error", error);
+      throw error
+    }
+  }
+
+create = async ( userName, name, email, password, cellPhone, age, sex, height, weight, descriptionObjective, restriction, conditioning) => {
+  return await prisma.user.create({
+    data: {
+      userName,
+      name,
+      email,
+      password,
+      cellPhone,
+      age,
+      sex,
+      height,
+      weight,
+      descriptionObjective,
+      restriction,
+      conditioning,
+    },
+  });
+};
+
 
   update = async (id, concluida) => {
     try {
-      const tarefa = await prisma.task.update({
+      const user = await prisma.user.update({
         where: { id },
         data: {
           concluida: concluida !== undefined ? concluida : true,
         }
       });
-      return tarefa;
+      return user;
     } catch (error) {
       console.log("Error", error);
       throw error
@@ -30,14 +54,14 @@ class TarefaModel {
 
   delete = async (id) => {
     try {
-      const tarefaDeletada = await prisma.task.delete({
+      const tarefaDeletada = await prisma.user.delete({
         where: { id },
       });
       return tarefaDeletada;
     } catch (error) {
-      console.error("Error ao deletar a tarefa!", error);
+      console.error("Error ao deletar a user!", error);
       throw error;
     }
   };
 }
-export default new TarefaModel();
+export default new UserModel();
