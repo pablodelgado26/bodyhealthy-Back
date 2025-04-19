@@ -7,7 +7,7 @@ class UserController {
     try {
       const users = await userModel.getAll();
       if (!users || users.length === 0) {
-        return res.status(200).json({ message: 'Nenhum usuário encontrado.', data: [] });
+        return res.status(200).json({ message: 'Nenhum usuário encontrado.'});
       }
       return res.status(200).json(users);
     } catch (error) {
@@ -168,12 +168,12 @@ class UserController {
     try {
       const sucesso = await userModel.delete(Number(id));
       if (!sucesso) {
-        return res.status(404).json({ erro: "Tarefa não encontrada" });
+        return res.status(404).json({ erro: "User não encontrado" });
       }
-      res.status(200).send({ message: "Tarefa deletada com sucesso" });
+      res.status(200).send({ message: "User deletado com sucesso" });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ erro: "Erro ao deletar tarefa" });
+      res.status(500).json({ erro: "Erro ao deletar User" });
     }
   };
 }

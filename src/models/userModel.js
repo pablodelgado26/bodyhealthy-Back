@@ -68,10 +68,10 @@ class UserModel {
 
   delete = async (id) => {
     try {
-      const tarefaDeletada = await prisma.user.delete({
+      const userDeletado = await prisma.user.delete({
         where: { id },
       });
-      return tarefaDeletada;
+      return userDeletado;
     } catch (error) {
       console.error("Error ao deletar a user!", error);
       throw error;
