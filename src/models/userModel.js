@@ -40,18 +40,29 @@ class UserModel {
   };
 
 
-  update = async (id, concluida) => {
+  update = async (id, name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning) => {
     try {
+      const data = {};
+      if (name !== undefined) data.name = name;
+      if (password !== undefined) data.password = password;
+      if (age !== undefined) data.age = parseInt(age);
+      if (sex !== undefined) data.sex = sex;
+      if (height !== undefined) data.height = parseFloat(height);
+      if (weight !== undefined) data.weight = parseFloat(weight);
+      if (descriptionObjective !== undefined) data.descriptionObjective = descriptionObjective;
+      if (restriction !== undefined) data.restriction = restriction;
+      if (conditioning !== undefined) data.conditioning = conditioning;
+  
       const user = await prisma.user.update({
         where: { id },
-        data: {
-          concluida: concluida !== undefined ? concluida : true,
-        }
+        data,
       });
-      return user;
+      return JSON.parse(JSON.stringify(user, (_, value) =>
+        typeof value === 'bigint' ? value.toString() : value
+      ));
     } catch (error) {
-      console.log("Error", error);
-      throw error
+      console.error(`Erro ao atualizar usuário com id ${id}:`, error.message, error.stack);
+      throw error;
     }
   };
 

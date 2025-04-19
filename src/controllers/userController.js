@@ -137,16 +137,29 @@ class UserController {
 
   update = async (req, res) => {
     const { id } = req.params;
-    const { concluida, descricao } = req.body;
+    const {
+      name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning,
+    } = req.body;
+  
+    const parsedId = parseInt(id);
+    if (isNaN(parsedId) || parsedId <= 0) {
+      return res.status(400).json({ erro: 'ID inválido.' });
+    }
+  
     try {
-      const tarefaAtualizada = await userModel.update(Number(id), concluida, descricao);
-      if (!tarefaAtualizada) {
-        return res.status(404).json({ erro: "Tarefa não encontrada" });
+      const userAtualizado = await userModel.update(
+        parsedId, name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning
+      );
+      if (!userAtualizado) {
+        return res.status(404).json({ erro: 'User não encontrado' });
       }
-      res.json(tarefaAtualizada)
+      return res.status(200).json(userAtualizado);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ erro: "Erro ao atualizar tarefa" });
+      if (error.code === 'P2025') {
+        return res.status(404).json({ erro: 'User não encontrado' });
+      }
+      return res.status(500).json({ erro: 'Erro ao atualizar User' });
     }
   };
 
