@@ -1,6 +1,6 @@
-# 🏋️‍♂🏋🏽‍♂️ Body&Healthy APP-BACK (blog)
+# 🏋️‍♂🏋🏽‍♂️ Body&Healthy APP-BACK & WEB-BACK (blog)
 
-Bem-vindo ao repositório de desenvolvimento de API do app Body&Healthy, Este guia irá ajudá-lo a configurar e executar o projeto localmente.
+Bem-vindo ao repositório de desenvolvimento de API do app e web Body&Healthy, Este guia irá ajudá-lo a configurar e executar o projeto localmente.
 
 ## Pré-requisitos
 
