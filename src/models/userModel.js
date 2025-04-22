@@ -40,7 +40,7 @@ class UserModel {
   };
 
 
-  update = async (id, name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning) => {
+  update = async (id, name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile) => {
     try {
       const data = {};
       if (name !== undefined) data.name = name;
@@ -52,6 +52,7 @@ class UserModel {
       if (descriptionObjective !== undefined) data.descriptionObjective = descriptionObjective;
       if (restriction !== undefined) data.restriction = restriction;
       if (conditioning !== undefined) data.conditioning = conditioning;
+      if (imageProfile !== undefined) data.imageProfile = imageProfile;
   
       const user = await prisma.user.update({
         where: { id },

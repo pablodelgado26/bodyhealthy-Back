@@ -10,6 +10,7 @@ CREATE TABLE "users" (
     "sex" TEXT NOT NULL,
     "height" REAL NOT NULL,
     "weight" REAL NOT NULL,
+    "imageProfile" TEXT,
     "descriptionObjective" TEXT,
     "restriction" TEXT,
     "conditioning" TEXT,

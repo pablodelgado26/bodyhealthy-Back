@@ -52,11 +52,12 @@ class UserController {
       descriptionObjective,
       restriction,
       conditioning,
+      imageProfile,
     } = req.body;
 
     try {
       // Validação de campos obrigatórios
-      if (!userName || !name || !email || !password || !cellPhone || !age || !sex || !height || !weight) {
+      if (!userName || !name || !email || !password || !cellPhone || !age || !sex || !height || !weight ) {
         return res.status(400).json({ erro: 'Algum campo obrigatório não preenchido.' });
       }
 
@@ -107,6 +108,7 @@ class UserController {
         descriptionObjective,
         restriction,
         conditioning,
+        imageProfile,
       });
 
       // Conversão de BigInt para string
@@ -138,7 +140,7 @@ class UserController {
   update = async (req, res) => {
     const { id } = req.params;
     const {
-      name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning,
+      name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile,
     } = req.body;
   
     const parsedId = parseInt(id);
@@ -148,7 +150,7 @@ class UserController {
   
     try {
       const userAtualizado = await userModel.update(
-        parsedId, name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning
+        parsedId, name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile
       );
       if (!userAtualizado) {
         return res.status(404).json({ erro: 'User não encontrado' });

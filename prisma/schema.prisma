@@ -24,6 +24,8 @@ model User {
   sex String
   height Float
   weight Float
+
+  imageProfile String?
   descriptionObjective String?
   restriction String?
   conditioning String? 

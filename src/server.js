@@ -5,7 +5,7 @@ import cors from "cors";
 import userRoutes from "./routes/userRoutes.js";
 
 config();
-const port = process.env.PORT || 4201;
+const port = process.env.PORT || 4001;
 
 const app = express();
 app.use(cors());
