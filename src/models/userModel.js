@@ -31,11 +31,41 @@ class UserModel {
 
   create = async (data) => {
     try {
+      const { userName, email, cellPhone } = data;
+      const parsedCellPhone = BigInt(cellPhone);
+  
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { userName },
+            { email },
+            { cellPhone: parsedCellPhone },
+          ],
+        },
+      });
+  
+      if (existingUser) {
+        if (existingUser.userName === userName) {
+          throw new Error("Nome de usuário já cadastrado.");
+        }
+        if (existingUser.email === email) {
+          throw new Error("E-mail já cadastrado.");
+        }
+        if (existingUser.cellPhone === parsedCellPhone) {
+          throw new Error("Número de celular já cadastrado.");
+        }
+      }
+  
+      const userToCreate = {
+        ...data,
+        cellPhone: parsedCellPhone,
+      };
+  
       return await prisma.user.create({
-        data,
+        data: userToCreate,
       });
     } catch (error) {
-      throw error; // Propaga o erro para o controller tratar
+      throw error;
     }
   };
 

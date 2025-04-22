@@ -1,5 +1,5 @@
 import userModel from "../models/userModel.js";
-import prisma from "../../prisma/client.js";
+import bcrypt from "bcryptjs";
 
 class UserController {
 
@@ -54,52 +54,31 @@ class UserController {
       conditioning,
       imageProfile,
     } = req.body;
-
+  
     try {
       // Validação de campos obrigatórios
-      if (!userName || !name || !email || !password || !cellPhone || !age || !sex || !height || !weight ) {
+      if (!userName || !name || !email || !password || !cellPhone || !age || !sex || !height || !weight) {
         return res.status(400).json({ erro: 'Algum campo obrigatório não preenchido.' });
       }
-
+  
       // Conversão de tipos com validação
       const parsedCellPhone = parseInt(cellPhone);
       const parsedAge = parseInt(age);
       const parsedHeight = parseFloat(height);
       const parsedWeight = parseFloat(weight);
-
+  
       if (isNaN(parsedCellPhone) || isNaN(parsedAge) || isNaN(parsedHeight) || isNaN(parsedWeight)) {
         return res.status(400).json({ erro: 'Formato inválido para celular, idade, altura ou peso.' });
       }
-
-      // Verificar unicidade de userName, email e cellPhone
-      const existingUser = await prisma.user.findFirst({
-        where: {
-          OR: [
-            { userName },
-            { email },
-            { cellPhone: parsedCellPhone },
-          ],
-        },
-      });
-
-      if (existingUser) {
-        if (existingUser.userName === userName) {
-          return res.status(409).json({ erro: 'Nome de usuário já cadastrado.' });
-        }
-        if (existingUser.email === email) {
-          return res.status(409).json({ erro: 'E-mail já cadastrado.' });
-        }
-        if (existingUser.cellPhone === BigInt(parsedCellPhone)) {
-          return res.status(409).json({ erro: 'Número de celular já cadastrado.' });
-        }
-      }
-
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
       // Criação do novo usuário chamando o model
       const novoUsuario = await userModel.create({
         userName,
         name,
         email,
-        password,
+        password: hashedPassword,
         cellPhone: parsedCellPhone,
         age: parsedAge,
         sex,
@@ -110,29 +89,17 @@ class UserController {
         conditioning,
         imageProfile,
       });
-
+  
       // Conversão de BigInt para string
       const usuarioSerializado = JSON.parse(JSON.stringify(novoUsuario, (_, value) =>
         typeof value === 'bigint' ? value.toString() : value
       ));
-
+  
       return res.status(201).json(usuarioSerializado);
     } catch (error) {
       console.error('Erro ao criar usuário:', error.message, error.stack);
-      if (error.code === 'P2002') {
-        const target = error.meta.target;
-        if (target.includes('email')) {
-          return res.status(409).json({ erro: 'E-mail já cadastrado.' });
-        }
-        if (target.includes('userName')) {
-          return res.status(409).json({ erro: 'Nome de usuário já cadastrado.' });
-        }
-        if (target.includes('cellPhone')) {
-          return res.status(409).json({ erro: 'Número de celular já cadastrado.' });
-        }
-      }
-      return res.status(500).json({
-        erro: 'Erro ao criar usuário. Verifique os campos ou possíveis duplicações.',
+      return res.status(400).json({
+        erro: error.message || 'Erro ao criar usuário.',
       });
     }
   };
