@@ -11,7 +11,7 @@ router.get("/:userName", userController.getByUserName);
 // Post criar um usuário
 router.post("/", userController.create);
 // Put atualizar um usuário
-router.put("/:id", userController.update);
+router.put("/:userName", userController.update);
 // Delete deletar um usuário
-router.delete("/:id", userController.delete);
+router.delete("/:userName", userController.delete);
 export default router;

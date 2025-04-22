@@ -111,41 +111,52 @@ class UserController {
   };
 
   update = async (req, res) => {
-    const { id } = req.params;
+    const { userName } = req.params; 
     const {
       name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile,
     } = req.body;
   
-    const parsedId = parseInt(id);
-    if (isNaN(parsedId) || parsedId <= 0) {
-      return res.status(400).json({ erro: 'ID inválido.' });
+    if (!userName) {
+      return res.status(400).json({ erro: 'userName é obrigatório.' });
     }
   
     try {
-      const hashedPassword = await bcrypt.hash(password, 10);
+      // Criptografando a senha
+      const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
   
       const userAtualizado = await userModel.update(
-        parsedId, name, hashedPassword, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile
+        userName, 
+        name,
+        hashedPassword,
+        age,
+        sex,
+        height,
+        weight,
+        descriptionObjective,
+        restriction,
+        conditioning,
+        imageProfile
       );
   
       if (!userAtualizado) {
-        return res.status(404).json({ erro: 'User não encontrado' });
+        return res.status(404).json({ erro: 'Usuário não encontrado' });
       }
   
       return res.status(200).json(userAtualizado);
     } catch (error) {
       console.error(error);
       if (error.code === 'P2025') {
-        return res.status(404).json({ erro: 'User não encontrado' });
+        return res.status(404).json({ erro: 'Usuário não encontrado' });
       }
-      return res.status(500).json({ erro: 'Erro ao atualizar User' });
+      return res.status(500).json({ erro: 'Erro ao atualizar usuário' });
     }
   };
+  
 
   delete = async (req, res) => {
-    const { id } = req.params;
+    const { userName } = req.params;
     try {
-      const sucesso = await userModel.delete(Number(id));
+      const sucesso = await userModel.delete(userName);
       if (!sucesso) {
         return res.status(404).json({ erro: "User não encontrado" });
       }

@@ -13,6 +13,7 @@ class UserModel {
       throw error;
     }
   };
+
   getByUserName = async (userName) => {
     try {
       const user = await prisma.user.findUnique({
@@ -25,7 +26,6 @@ class UserModel {
       throw error;
     }
   };
-  
 
   create = async (data) => {
     try {
@@ -93,9 +93,7 @@ class UserModel {
     }
   };
   
-
-
-  update = async (id, name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile) => {
+  update = async (userName, name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile) => {
     try {
       const data = {};
       if (name !== undefined) data.name = name;
@@ -110,22 +108,22 @@ class UserModel {
       if (imageProfile !== undefined) data.imageProfile = imageProfile;
   
       const user = await prisma.user.update({
-        where: { id },
+        where: { userName },
         data,
       });
       return JSON.parse(JSON.stringify(user, (_, value) =>
         typeof value === 'bigint' ? value.toString() : value
       ));
     } catch (error) {
-      console.error(`Erro ao atualizar usuário com id ${id}:`, error.message, error.stack);
+      console.error(`Erro ao atualizar usuário com userName ${userName}:`, error.message, error.stack);
       throw error;
     }
   };
 
-  delete = async (id) => {
+  delete = async (userName) => {
     try {
       const userDeletado = await prisma.user.delete({
-        where: { id },
+        where: { userName },
       });
       return userDeletado;
     } catch (error) {
