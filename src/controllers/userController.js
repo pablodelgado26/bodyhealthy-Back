@@ -116,12 +116,16 @@ class UserController {
     }
   
     try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
       const userAtualizado = await userModel.update(
-        parsedId, name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile
+        parsedId, name, hashedPassword, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile
       );
+  
       if (!userAtualizado) {
         return res.status(404).json({ erro: 'User não encontrado' });
       }
+  
       return res.status(200).json(userAtualizado);
     } catch (error) {
       console.error(error);
