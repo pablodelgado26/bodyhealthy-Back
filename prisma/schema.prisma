@@ -28,12 +28,31 @@ model User {
   imageProfile String?
   descriptionObjective String?
   restriction String?
-  conditioning String? 
+  conditioning String?
+
+  posts Post[] 
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("users")
+}
+
+model Post {
+  id Int @id @default(autoincrement())
+  title String
+  description String
+  imagePost String?
+  like Int
+  comment Int
+
+  userName String
+  user User @relation(fields: [userName], references: [userName])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("posts")
 }
 
 
