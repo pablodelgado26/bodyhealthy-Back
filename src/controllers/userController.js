@@ -16,27 +16,33 @@ class UserController {
     }
   };
 
-  getById = async (req, res) => {
-    const { id } = req.params;
-
-    // Valida se id é um número válido
-    const parsedId = parseInt(id);
-    if (isNaN(parsedId) || parsedId <= 0) {
-      return res.status(400).json({ erro: 'ID inválido.' });
+  getByUserName = async (req, res) => {
+    const { userName } = req.params;
+  
+    // Validação básica
+    if (!userName || typeof userName !== 'string' || userName.trim() === '') {
+      return res.status(400).json({ erro: 'userName inválido.' });
     }
-
+  
     try {
-      const user = await userModel.getById(parsedId);
+      const user = await userModel.getByUserName(userName.trim());
       if (!user) {
         return res.status(404).json({ erro: 'Usuário não encontrado.' });
       }
-      return res.status(200).json(user);
+  
+      // Converte BigInt para string para evitar erro de serialização
+      const userSerialized = JSON.parse(JSON.stringify(user, (_, value) =>
+        typeof value === 'bigint' ? value.toString() : value
+      ));
+  
+      return res.status(200).json(userSerialized);
     } catch (error) {
-      console.error(`Erro no controller getById (id: ${parsedId}):`, error.message, error.stack);
+      console.error(`Erro no controller getByUserName (userName: ${userName}):`, error.message, error.stack);
       return res.status(500).json({ erro: 'Erro ao buscar usuário.' });
     }
   };
-
+  
+  
 
   create = async (req, res) => {
     const {

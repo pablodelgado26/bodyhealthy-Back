@@ -13,21 +13,19 @@ class UserModel {
       throw error;
     }
   };
-
-  getById = async (id) => {
+  getByUserName = async (userName) => {
     try {
       const user = await prisma.user.findUnique({
-        where: { id },
+        where: { userName },
       });
-      // Serializa BigInt (cellPhone) para string
-      return user ? JSON.parse(JSON.stringify(user, (_, value) =>
-        typeof value === 'bigint' ? value.toString() : value
-      )) : null;
+  
+      return user || null;
     } catch (error) {
-      console.error(`Erro ao buscar usuário com id ${id}:`, error.message, error.stack);
+      console.error(`Erro ao buscar usuário com userName "${userName}":`, error.message, error.stack);
       throw error;
     }
   };
+  
 
   create = async (data) => {
     try {
