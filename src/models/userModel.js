@@ -57,7 +57,7 @@ class UserModel {
       }
   
       const userToCreate = {
-        data,
+        ...data,
         cellPhone: parsedCellPhone,
       };
   
