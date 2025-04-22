@@ -31,7 +31,22 @@ class UserModel {
 
   create = async (data) => {
     try {
-      const { userName, email, cellPhone } = data;
+      const {
+        userName,
+        name,
+        email,
+        password,
+        cellPhone,
+        age,
+        sex,
+        height,
+        weight,
+        descriptionObjective,
+        restriction,
+        conditioning,
+        imageProfile,
+      } = data;
+  
       const parsedCellPhone = BigInt(cellPhone);
   
       const existingUser = await prisma.user.findFirst({
@@ -57,8 +72,19 @@ class UserModel {
       }
   
       const userToCreate = {
-        ...data,
+        userName,
+        name,
+        email,
+        password,
         cellPhone: parsedCellPhone,
+        age,
+        sex,
+        height,
+        weight,
+        descriptionObjective,
+        restriction,
+        conditioning,
+        imageProfile,
       };
   
       return await prisma.user.create({
@@ -68,6 +94,7 @@ class UserModel {
       throw error;
     }
   };
+  
 
 
   update = async (id, name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile) => {
