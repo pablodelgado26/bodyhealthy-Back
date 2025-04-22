@@ -13,144 +13,107 @@ class PostController {
     }
   };
 
-  getByUserName = async (req, res) => {
-    const { userName } = req.params;
+  getByPostTitle = async (req, res) => {
+    const { title } = req.params;
   
     // Validação básica
-    if (!userName || typeof userName !== 'string' || userName.trim() === '') {
-      return res.status(400).json({ erro: 'userName inválido.' });
+    if (!title || typeof title !== 'string' || title.trim() === '') {
+      return res.status(400).json({ erro: 'title inválido.' });
     }
   
     try {
-      const user = await postModel.getByUserName(userName.trim());
-      if (!user) {
-        return res.status(404).json({ erro: 'Usuário não encontrado.' });
+      const post = await postModel.getByPostTitle(title.trim());
+      if (!post) {
+        return res.status(404).json({ erro: 'Postagem não encontrada.' });
       }
-  
-      // Converte BigInt para string para evitar erro de serialização
-      const userSerialized = JSON.parse(JSON.stringify(user, (_, value) =>
-        typeof value === 'bigint' ? value.toString() : value
-      ));
-  
-      return res.status(200).json(userSerialized);
+      return res.status(200).json(postSerialized);
     } catch (error) {
-      console.error(`Erro no controller getByUserName (userName: ${userName}):`, error.message, error.stack);
-      return res.status(500).json({ erro: 'Erro ao buscar usuário.' });
+      console.error(`Erro no controller getByPostTitle (title: ${title}):`, error.message, error.stack);
+      return res.status(500).json({ erro: 'Erro ao buscar postagem.' });
     }
   };
   
   
 
   create = async (req, res) => {
-    const {
-      userName,
-      name,
-      email,
-      password,
-      cellPhone,
-      age,
-      sex,
-      height,
-      weight,
-      descriptionObjective,
-      restriction,
-      conditioning,
-      imageProfile,
-    } = req.body;
+    const { title, description, imagePost } = req.body;
+    const userName = req.user?.userName;
   
     try {
-      // Validação de campos obrigatórios
-      if (!userName || !name || !email || !password || !cellPhone || !age || !sex || !height || !weight) {
-        return res.status(400).json({ erro: 'Algum campo obrigatório não preenchido.' });
+      if (!title || !description) {
+        return res.status(400).json({
+          erro: "Os campos 'title' e 'description' são obrigatórios.",
+        });
       }
   
-      // Conversão de tipos com validação
-      const parsedCellPhone = parseInt(cellPhone);
-      const parsedAge = parseInt(age);
-      const parsedHeight = parseFloat(height);
-      const parsedWeight = parseFloat(weight);
-  
-      if (isNaN(parsedCellPhone) || isNaN(parsedAge) || isNaN(parsedHeight) || isNaN(parsedWeight)) {
-        return res.status(400).json({ erro: 'Formato inválido para celular, idade, altura ou peso.' });
+      if (!userName) {
+        return res.status(401).json({
+          erro: "Usuário não autenticado.",
+        });
       }
   
-      const hashedPassword = await bcrypt.hash(password, 10);
-  
-      // Criação do novo usuário chamando o model
-      const novoUsuario = await postModel.create({
-        userName,
-        name,
-        email,
-        password: hashedPassword,
-        cellPhone: parsedCellPhone,
-        age: parsedAge,
-        sex,
-        height: parsedHeight,
-        weight: parsedWeight,
-        descriptionObjective,
-        restriction,
-        conditioning,
-        imageProfile,
+      const novoPost = await postModel.create({
+        data: {
+          title,
+          description,
+          imagePost,
+          like: 0,
+          comment: 0,
+          userName,
+        },
       });
   
-      // Conversão de BigInt para string
-      const usuarioSerializado = JSON.parse(JSON.stringify(novoUsuario, (_, value) =>
-        typeof value === 'bigint' ? value.toString() : value
-      ));
-  
-      return res.status(201).json(usuarioSerializado);
-    } catch (error) {
-      console.error('Erro ao criar usuário:', error.message, error.stack);
-      return res.status(400).json({
-        erro: error.message || 'Erro ao criar usuário.',
-      });
-    }
-  };
-
-  update = async (req, res) => {
-    const { id } = req.params;
-    const {
-      name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile,
-    } = req.body;
-  
-    const parsedId = parseInt(id);
-    if (isNaN(parsedId) || parsedId <= 0) {
-      return res.status(400).json({ erro: 'ID inválido.' });
-    }
-  
-    try {
-      const hashedPassword = await bcrypt.hash(password, 10);
-  
-      const userAtualizado = await postModel.update(
-        parsedId, name, hashedPassword, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile
-      );
-  
-      if (!userAtualizado) {
-        return res.status(404).json({ erro: 'User não encontrado' });
-      }
-  
-      return res.status(200).json(userAtualizado);
+      res.status(201).json(novoPost);
     } catch (error) {
       console.error(error);
-      if (error.code === 'P2025') {
-        return res.status(404).json({ erro: 'User não encontrado' });
-      }
-      return res.status(500).json({ erro: 'Erro ao atualizar User' });
+      res.status(500).json({ erro: "Erro ao criar post." });
     }
   };
+  
+  update = async (req, res) => {
+    const { id } = req.params;
+    const { title, description, imagePost } = req.body;
+  
+    try {
+      const postAtualizado = await postModel.update(Number(id), {
+        title,
+        description,
+        imagePost,
+      });
+  
+      if (!postAtualizado) {
+        return res.status(404).json({ erro: "Post não encontrado" });
+      }
+  
+      res.json(postAtualizado);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ erro: "Erro ao atualizar post" });
+    }
+  };
+  
 
   delete = async (req, res) => {
     const { id } = req.params;
+  
     try {
-      const sucesso = await postModel.delete(Number(id));
-      if (!sucesso) {
-        return res.status(404).json({ erro: "User não encontrado" });
+      const postDeletado = await postModel.delete(Number(id));
+  
+      if (!postDeletado) {
+        return res.status(404).json({ erro: "Post não encontrado" });
       }
-      res.status(200).send({ message: "User deletado com sucesso" });
+  
+      res.status(200).send({ message: "Post deletado com sucesso" });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ erro: "Erro ao deletar User" });
+      res.status(500).json({ erro: "Erro ao deletar post" });
     }
   };
+  
+
+  
+
+
+  
 }
 export default new PostController();
