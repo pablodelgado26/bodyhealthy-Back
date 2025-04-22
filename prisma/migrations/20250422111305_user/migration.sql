@@ -1,6 +1,6 @@
 -- CreateTable
 CREATE TABLE "users" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "userName" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
@@ -8,14 +8,16 @@ CREATE TABLE "users" (
     "cellPhone" BIGINT NOT NULL,
     "age" INTEGER NOT NULL,
     "sex" TEXT NOT NULL,
-    "height" REAL NOT NULL,
-    "weight" REAL NOT NULL,
+    "height" DOUBLE PRECISION NOT NULL,
+    "weight" DOUBLE PRECISION NOT NULL,
     "imageProfile" TEXT,
     "descriptionObjective" TEXT,
     "restriction" TEXT,
     "conditioning" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
