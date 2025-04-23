@@ -27,6 +27,30 @@ class UserModel {
     }
   };
 
+  getByLogin = async (login) => {
+    try {
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { email: login },
+            { userName: login },
+          ],
+        },
+        select: {
+          id: true,
+          userName: true,
+          email: true,
+          password: true,
+        },
+      });
+      return user || null;
+    } catch (error) {
+      console.error(`Erro ao buscar usuário com login "${login}":`, error.message);
+      throw error;
+    }
+  };
+  
+
   create = async (data) => {
     try {
       const {

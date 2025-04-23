@@ -1,5 +1,6 @@
 import userModel from "../models/userModel.js";
 import bcrypt from "bcryptjs";
+import { gerarToken } from "../utils/jwt.js";
 
 class UserController {
 
@@ -7,7 +8,7 @@ class UserController {
     try {
       const users = await userModel.getAll();
       if (!users || users.length === 0) {
-        return res.status(200).json({ message: 'Nenhum usuário encontrado.'});
+        return res.status(200).json({ message: 'Nenhum usuário encontrado.' });
       }
       return res.status(200).json(users);
     } catch (error) {
@@ -18,31 +19,29 @@ class UserController {
 
   getByUserName = async (req, res) => {
     const { userName } = req.params;
-  
+
     // Validação básica
     if (!userName || typeof userName !== 'string' || userName.trim() === '') {
       return res.status(400).json({ erro: 'userName inválido.' });
     }
-  
+
     try {
       const user = await userModel.getByUserName(userName.trim());
       if (!user) {
         return res.status(404).json({ erro: 'Usuário não encontrado.' });
       }
-  
+
       // Converte BigInt para string para evitar erro de serialização
       const userSerialized = JSON.parse(JSON.stringify(user, (_, value) =>
         typeof value === 'bigint' ? value.toString() : value
       ));
-  
+
       return res.status(200).json(userSerialized);
     } catch (error) {
       console.error(`Erro no controller getByUserName (userName: ${userName}):`, error.message, error.stack);
       return res.status(500).json({ erro: 'Erro ao buscar usuário.' });
     }
   };
-  
-  
 
   create = async (req, res) => {
     const {
@@ -60,25 +59,25 @@ class UserController {
       conditioning,
       imageProfile,
     } = req.body;
-  
+
     try {
       // Validação de campos obrigatórios
       if (!userName || !name || !email || !password || !cellPhone || !age || !sex || !height || !weight) {
         return res.status(400).json({ erro: 'Algum campo obrigatório não preenchido.' });
       }
-  
+
       // Conversão de tipos com validação
       const parsedCellPhone = parseInt(cellPhone);
       const parsedAge = parseInt(age);
       const parsedHeight = parseFloat(height);
       const parsedWeight = parseFloat(weight);
-  
+
       if (isNaN(parsedCellPhone) || isNaN(parsedAge) || isNaN(parsedHeight) || isNaN(parsedWeight)) {
         return res.status(400).json({ erro: 'Formato inválido para celular, idade, altura ou peso.' });
       }
-  
+
       const hashedPassword = await bcrypt.hash(password, 10);
-  
+
       // Criação do novo usuário chamando o model
       const novoUsuario = await userModel.create({
         userName,
@@ -95,12 +94,12 @@ class UserController {
         conditioning,
         imageProfile,
       });
-  
+
       // Conversão de BigInt para string
       const usuarioSerializado = JSON.parse(JSON.stringify(novoUsuario, (_, value) =>
         typeof value === 'bigint' ? value.toString() : value
       ));
-  
+
       return res.status(201).json(usuarioSerializado);
     } catch (error) {
       console.error('Erro ao criar usuário:', error.message, error.stack);
@@ -111,21 +110,21 @@ class UserController {
   };
 
   update = async (req, res) => {
-    const { userName } = req.params; 
+    const { userName } = req.params;
     const {
       name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile,
     } = req.body;
-  
+
     if (!userName) {
       return res.status(400).json({ erro: 'userName é obrigatório.' });
     }
-  
+
     try {
       // Criptografando a senha
       const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
-  
+
       const userAtualizado = await userModel.update(
-        userName, 
+        userName,
         name,
         hashedPassword,
         age,
@@ -137,11 +136,11 @@ class UserController {
         conditioning,
         imageProfile
       );
-  
+
       if (!userAtualizado) {
         return res.status(404).json({ erro: 'Usuário não encontrado' });
       }
-  
+
       return res.status(200).json(userAtualizado);
     } catch (error) {
       console.error(error);
@@ -151,7 +150,6 @@ class UserController {
       return res.status(500).json({ erro: 'Erro ao atualizar usuário' });
     }
   };
-  
 
   delete = async (req, res) => {
     const { userName } = req.params;
@@ -166,5 +164,35 @@ class UserController {
       res.status(500).json({ erro: "Erro ao deletar User" });
     }
   };
+
+  login = async (req, res) => {
+    const { login, password } = req.body;
+  
+    if (!login || !password) {
+      return res.status(400).json({ erro: "Email ou nome de usuário e senha são obrigatórios." });
+    }
+  
+    try {
+      const user = await userModel.getByLogin(login);
+  
+      if (!user) {
+        return res.status(404).json({ erro: "Usuário não encontrado." });
+      }
+  
+      const senhaCorreta = await bcrypt.compare(password, user.password);
+  
+      if (!senhaCorreta) {
+        return res.status(401).json({ erro: "Senha incorreta." });
+      }
+  
+      const token = gerarToken({ id: user.id, userName: user.userName, email: user.email });
+  
+      return res.status(200).json({ token });
+    } catch (error) {
+      console.error("Erro no login:", error.message);
+      return res.status(500).json({ erro: "Erro ao fazer login." });
+    }
+  };
+
 }
 export default new UserController();
