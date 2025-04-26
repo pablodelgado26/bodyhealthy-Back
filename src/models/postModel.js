@@ -2,13 +2,31 @@ import prisma from "../../prisma/client.js";
 
 class PostModel {
   getAll = async () => {
-    return await prisma.post.findMany();
+    return await prisma.post.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        user: {
+          select: {
+            userName: true,
+          },
+        },
+      },
+    });
   }
 
   getByPostTitle = async (title) => {
     try {
       const post = await prisma.post.findUnique({
         where: { title },
+        include: {
+          user: {
+            select: {
+              userName: true,
+            },
+          },
+        },
       });
 
       return post || null;
@@ -18,50 +36,51 @@ class PostModel {
     }
   };
 
+  async create(
+    title,
+    description,
+    imagePost,
+    userName,
+  ) {
+    const novoPost = await prisma.post.create({
+      data: {
+        title,
+        description,
+        imagePost,
+        userName: String(userName),
+      },
+    });
 
-  create = async (req, res) => {
-    const {
-      title,
-      description,
-      imagePost,
-      like = 0,
-      comment = 0,
-    } = req.body;
+    return novoPost;
+  }
 
-    const userName = req.user?.userName; // pega do usuário autenticado
-
-    try {
-      if (!title || !description) {
-        return res.status(400).json({
-          erro: "Campos obrigatórios: title e description",
-        });
-      }
-
-      if (!userName) {
-        return res.status(401).json({
-          erro: "Usuário não autenticado",
-        });
-      }
-
-      const novoPost = await prisma.post.create({
-        data: {
-          title,
-          description,
-          imagePost,
-          like,
-          comment,
-          userName,
+  async likePost(title) {
+    const updatedPost = await prisma.post.update({
+      where: { title: title },
+      data: {
+        like: {
+          increment: 1, 
         },
-      });
-
-      res.status(201).json(novoPost);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ erro: "Erro ao criar post" });
-    }
-  };
+      },
+    });
+  
+    return updatedPost;
+  }
 
 
+  async commentPost(title) {
+    const updatedPost = await prisma.post.update({
+      where: { title: title },
+      data: {
+        comment: {
+          increment: 1, 
+        },
+      },
+    });
+  
+    return updatedPost;
+  }
+  
 
   update = async (id, dadosAtualizados) => {
     try {

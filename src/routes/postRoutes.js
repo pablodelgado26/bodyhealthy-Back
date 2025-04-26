@@ -6,12 +6,23 @@ const router = express.Router();
 
 // Get buscar todos os usuários
 router.get("/", postController.getAll);
+
 // Get buscar um usuário pelo id
 router.get("/:title", postController.getByPostTitle);
+
 // Post criar um usuário
-router.post("/", postController.create);
+router.post("/", postController.createPost);
+
 // Put atualizar um usuário
 router.put("/:id", postController.update);
+
 // Delete deletar um usuário
 router.delete("/:id", postController.delete);
+
+// Like um post
+router.patch("/:title/like", postController.likePost);
+
+// Comment um post
+router.patch("/:title/comment", postController.commentPost);
+
 export default router;

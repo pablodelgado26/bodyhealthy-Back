@@ -3,7 +3,18 @@ import prisma from "../../prisma/client.js";
 class UserModel {
   getAll = async () => {
     try {
-      const users = await prisma.user.findMany();
+      const users = await prisma.user.findMany({
+        orderBy: {
+          userName: 'desc',
+        },
+        include: {
+          posts: {
+            select: {
+              title: true,
+            },
+          }
+        },
+      });
       // Serializa BigInt (cellPhone) para string
       return JSON.parse(JSON.stringify(users, (_, value) =>
         typeof value === 'bigint' ? value.toString() : value
@@ -18,6 +29,13 @@ class UserModel {
     try {
       const user = await prisma.user.findUnique({
         where: { userName },
+        include: {
+          posts: {
+            select: {
+              title: true,
+            },
+          }
+        },
       });
   
       return user || null;

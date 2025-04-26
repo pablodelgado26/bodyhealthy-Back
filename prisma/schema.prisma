@@ -40,11 +40,11 @@ model User {
 
 model Post {
   id Int @id @default(autoincrement())
-  title String
+  title String @unique
   description String
   imagePost String?
-  like Int
-  comment Int
+  like Int @default(0)
+  comment Int @default(0)
 
   userName String
   user User @relation(fields: [userName], references: [userName])
