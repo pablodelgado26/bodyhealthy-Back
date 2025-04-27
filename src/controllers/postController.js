@@ -8,30 +8,27 @@ class PostController {
       const posts = await postModel.getAll();
       res.json(posts);
     } catch (error) {
-      console.error(error);
+      console.error("Erro ao buscar todos os posts",error);
       res.status(500).json({ erro: "Erro ao buscar posts" });
     }
   };
 
-  getByPostTitle = async (req, res) => {
-    const { title } = req.params;
-  
-    // Validação básica
-    if (!title || typeof title !== 'string' || title.trim() === '') {
-      return res.status(400).json({ erro: 'title inválido.' });
-    }
-  
+  async getByPostTitle(req, res) {
     try {
-      const post = await postModel.getByPostTitle(title.trim());
-      if (!post) {
-        return res.status(404).json({ erro: 'Postagem não encontrada.' });
+      const { title } = req.params;
+
+      const titulo = await postModel.getByTitle(title);
+
+      if (!titulo) {
+        return res.status(404).json({ error: "titulo não encontrada" });
       }
-      return res.status(200).json(postSerialized);
+
+      res.json(titulo);
     } catch (error) {
-      console.error(`Erro no controller getByPostTitle (title: ${title}):`, error.message, error.stack);
-      return res.status(500).json({ erro: 'Erro ao buscar postagem.' });
+      console.error("Erro ao buscar postagem pelo titulo:", error);
+      res.status(500).json({ error: "Erro ao buscar postagem pelo titulo" });
     }
-  };
+  }
   
   async createPost(req, res) {
     try {
@@ -69,45 +66,52 @@ class PostController {
     }
   }
   
-  update = async (req, res) => {
-    const { id } = req.params;
-    const { title, description, imagePost } = req.body;
-  
+  async updatePost(req, res) {
     try {
-      const postAtualizado = await postModel.update(Number(id), {
+      const { title } = req.params;
+      const { description, imagePost } = req.body;
+  
+      if (!title) {
+        return res.status(400).json({ error: "Título é obrigatório." });
+      }
+  
+      const postAtualizado = await postModel.update(
         title,
         description,
-        imagePost,
-      });
+        imagePost
+      );
   
       if (!postAtualizado) {
-        return res.status(404).json({ erro: "Post não encontrado" });
+        return res.status(404).json({ error: "Post não encontrado." });
       }
   
-      res.json(postAtualizado);
+      res.status(200).json({
+        message: "Post atualizado com sucesso.",
+        post: postAtualizado,
+      });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ erro: "Erro ao atualizar post" });
+      console.error("Erro ao atualizar postagem:", error.message);
+      res.status(500).json({ error: "Erro ao atualizar postagem." });
     }
-  };
+  }
   
-
-  delete = async (req, res) => {
-    const { id } = req.params;
-  
+  async delete(req, res) {
     try {
-      const postDeletado = await postModel.delete(Number(id));
-  
-      if (!postDeletado) {
-        return res.status(404).json({ erro: "Post não encontrado" });
+      const { title } = req.params;
+
+      // Remover o carta
+      const result = await postModel.delete(title);
+
+      if (!result) {
+        return res.status(404).json({ error: "carta não encontrada" });
       }
-  
-      res.status(200).send({ message: "Post deletado com sucesso" });
+
+      res.status(204).end(); // Resposta sem conteúdo
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ erro: "Erro ao deletar post" });
+      console.error("Erro ao remover carta:", error);
+      res.status(500).json({ error: "Erro ao remover carta" });
     }
-  };
+  }
 
   async likePost(req, res) {
     try {
@@ -133,7 +137,6 @@ class PostController {
     }
   }
 
-
   async commentPost(req, res) {
     try {
       const { title } = req.params;
@@ -157,7 +160,6 @@ class PostController {
       res.status(500).json({ error: "Erro ao comentar na postagem" });
     }
   }
-  
   
 }
 export default new PostController();

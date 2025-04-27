@@ -14,10 +14,10 @@ router.get("/:title", postController.getByPostTitle);
 router.post("/", postController.createPost);
 
 // Put atualizar um usuário
-router.put("/:id", postController.update);
+router.put("/:title", postController.updatePost);
 
 // Delete deletar um usuário
-router.delete("/:id", postController.delete);
+router.delete("/:title", postController.delete);
 
 // Like um post
 router.patch("/:title/like", postController.likePost);

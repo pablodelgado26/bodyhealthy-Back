@@ -1,10 +1,11 @@
 import prisma from "../../prisma/client.js";
 
 class PostModel {
-  getAll = async () => {
-    return await prisma.post.findMany({
+  
+  async getAll() {
+    const posts = await prisma.post.findMany({
       orderBy: {
-        createdAt: "desc",
+        title: 'desc',
       },
       include: {
         user: {
@@ -14,27 +15,26 @@ class PostModel {
         },
       },
     });
-  }
 
-  getByPostTitle = async (title) => {
-    try {
-      const post = await prisma.post.findUnique({
-        where: { title },
-        include: {
-          user: {
-            select: {
-              userName: true,
-            },
+    console.log(posts);
+
+    return posts;
+  }
+  
+  async getByTitle(title) {
+    const post = await prisma.post.findUnique({
+      where: { title },
+      include: {
+        user: {
+          select: {
+            userName: true,
           },
         },
-      });
+      },
+    });
 
-      return post || null;
-    } catch (error) {
-      console.error(`Erro ao buscar postagem com titulo "${title}":`, error.message, error.stack);
-      throw error;
-    }
-  };
+    return post;
+  }
 
   async create(
     title,
@@ -67,7 +67,6 @@ class PostModel {
     return updatedPost;
   }
 
-
   async commentPost(title) {
     const updatedPost = await prisma.post.update({
       where: { title: title },
@@ -81,35 +80,47 @@ class PostModel {
     return updatedPost;
   }
   
-
-  update = async (id, dadosAtualizados) => {
-    try {
-      const postAtualizado = await prisma.post.update({
-        where: { id },
-        data: {
-          title: dadosAtualizados.title,
-          description: dadosAtualizados.description,
-          imagePost: dadosAtualizados.imagePost,
-          // Você pode permitir atualizar like/comment também se quiser
-        }
-      });
-      return postAtualizado;
-    } catch (error) {
-      console.error("Erro ao atualizar post:", error);
-      throw error;
+  async update(title, description, imagePost) {
+    if (!title) {
+      throw new Error('Título é obrigatório para atualizar o post.');
     }
-  };
-
-  delete = async (id) => {
-    try {
-      const postDeletado = await prisma.post.delete({
-        where: { id },
-      });
-      return postDeletado;
-    } catch (error) {
-      console.error("Erro ao deletar o post:", error);
-      throw error;
+  
+    const post = await prisma.post.findUnique({
+      where: { title },
+      include: { user: { select: { userName: true } } }
+    });
+  
+    if (!post) {
+      return null;
     }
-  };
+  
+    const postAtualizado = await prisma.post.update({
+      where: { title },
+      data: {
+        description,
+        imagePost,
+      },
+    });
+  
+    return postAtualizado;
+  }
+  
+  async delete(title) {
+    const post = await this.getByTitle(title);
+    if (!post) {
+      return null;
+    }
+    await prisma.post.delete({
+      where: { title },
+      include: {
+        user: {
+          select: {
+            userName: true,
+          },
+        },
+      },
+    });
+    return true;
+  }
 }
 export default new PostModel();
