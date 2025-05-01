@@ -2,7 +2,7 @@ import prisma from "../../prisma/client.js";
 
 class UserModel {
 
-  getAll = async () => {
+  async getAll() {
     try {
       const users = await prisma.user.findMany({
         orderBy: {
@@ -13,20 +13,23 @@ class UserModel {
             select: {
               title: true,
             },
-          }
+          },
         },
       });
+
       // Serializa BigInt (cellPhone) para string
-      return JSON.parse(JSON.stringify(users, (_, value) =>
+      const serializedUsers = JSON.parse(JSON.stringify(users, (_, value) =>
         typeof value === 'bigint' ? value.toString() : value
       ));
+
+      return serializedUsers;
     } catch (error) {
       console.error('Erro ao buscar todos os usuários:', error.message, error.stack);
       throw error;
     }
-  };
+  }
 
-  getByUserName = async (userName) => {
+  async getByUserName(userName) {
     try {
       const user = await prisma.user.findUnique({
         where: { userName },
@@ -35,31 +38,31 @@ class UserModel {
             select: {
               title: true,
             },
-          }
+          },
         },
       });
-  
+
       return user || null;
     } catch (error) {
       console.error(`Erro ao buscar usuário com userName "${userName}":`, error.message, error.stack);
       throw error;
     }
-  };
+  }
 
   async findByUserNameOrEmail(userName, email) {
     const user = await prisma.user.findFirst({
-        where: {
-            OR: [
-                { userName },
-                { email },
-            ],
-        },
+      where: {
+        OR: [
+          { userName },
+          { email },
+        ],
+      },
     });
 
     return user;
-}
+  }
 
-  create = async (data) => {
+  async create(data) {
     try {
       const {
         userName,
@@ -76,9 +79,9 @@ class UserModel {
         conditioning,
         imageProfile,
       } = data;
-  
+
       const parsedCellPhone = BigInt(cellPhone);
-  
+
       const existingUser = await prisma.user.findFirst({
         where: {
           OR: [
@@ -88,7 +91,7 @@ class UserModel {
           ],
         },
       });
-  
+
       if (existingUser) {
         if (existingUser.userName === userName) {
           throw new Error("Nome de usuário já cadastrado.");
@@ -100,7 +103,7 @@ class UserModel {
           throw new Error("Número de celular já cadastrado.");
         }
       }
-  
+
       const userToCreate = {
         userName,
         name,
@@ -116,16 +119,16 @@ class UserModel {
         conditioning,
         imageProfile,
       };
-  
+
       return await prisma.user.create({
         data: userToCreate,
       });
     } catch (error) {
       throw error;
     }
-  };
-  
-  update = async (userName, name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile) => {
+  }
+
+  async update(userName, name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile) {
     try {
       const data = {};
       if (name !== undefined) data.name = name;
@@ -138,7 +141,7 @@ class UserModel {
       if (restriction !== undefined) data.restriction = restriction;
       if (conditioning !== undefined) data.conditioning = conditioning;
       if (imageProfile !== undefined) data.imageProfile = imageProfile;
-  
+
       const user = await prisma.user.update({
         where: { userName },
         data,
@@ -150,19 +153,19 @@ class UserModel {
       console.error(`Erro ao atualizar usuário com userName ${userName}:`, error.message, error.stack);
       throw error;
     }
-  };
+  }
 
-  delete = async (userName) => {
+  async delete(userName) {
     try {
       const userDeletado = await prisma.user.delete({
         where: { userName },
       });
       return userDeletado;
     } catch (error) {
-      console.error("Error ao deletar a user!", error);
+      console.error("Erro ao deletar o usuário!", error);
       throw error;
     }
-  };
+  }
 
 }
 export default new UserModel();
