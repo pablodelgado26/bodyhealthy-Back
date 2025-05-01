@@ -1,6 +1,5 @@
 import userModel from "../models/userModel.js";
 import bcrypt from "bcryptjs";
-import { gerarToken } from "../utils/jwt.js";
 
 class UserController {
 
@@ -40,72 +39,6 @@ class UserController {
     } catch (error) {
       console.error(`Erro no controller getByUserName (userName: ${userName}):`, error.message, error.stack);
       return res.status(500).json({ erro: 'Erro ao buscar usuário.' });
-    }
-  };
-
-  create = async (req, res) => {
-    const {
-      userName,
-      name,
-      email,
-      password,
-      cellPhone,
-      age,
-      sex,
-      height,
-      weight,
-      descriptionObjective,
-      restriction,
-      conditioning,
-      imageProfile,
-    } = req.body;
-
-    try {
-      // Validação de campos obrigatórios
-      if (!userName || !name || !email || !password || !cellPhone || !age || !sex || !height || !weight) {
-        return res.status(400).json({ erro: 'Algum campo obrigatório não preenchido.' });
-      }
-
-      // Conversão de tipos com validação
-      const parsedCellPhone = parseInt(cellPhone);
-      const parsedAge = parseInt(age);
-      const parsedHeight = parseFloat(height);
-      const parsedWeight = parseFloat(weight);
-
-      if (isNaN(parsedCellPhone) || isNaN(parsedAge) || isNaN(parsedHeight) || isNaN(parsedWeight)) {
-        return res.status(400).json({ erro: 'Formato inválido para celular, idade, altura ou peso.' });
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Criação do novo usuário chamando o model
-      const novoUsuario = await userModel.create({
-        userName,
-        name,
-        email,
-        password: hashedPassword,
-        cellPhone: parsedCellPhone,
-        age: parsedAge,
-        sex,
-        height: parsedHeight,
-        weight: parsedWeight,
-        descriptionObjective,
-        restriction,
-        conditioning,
-        imageProfile,
-      });
-
-      // Conversão de BigInt para string
-      const usuarioSerializado = JSON.parse(JSON.stringify(novoUsuario, (_, value) =>
-        typeof value === 'bigint' ? value.toString() : value
-      ));
-
-      return res.status(201).json(usuarioSerializado);
-    } catch (error) {
-      console.error('Erro ao criar usuário:', error.message, error.stack);
-      return res.status(400).json({
-        erro: error.message || 'Erro ao criar usuário.',
-      });
     }
   };
 
@@ -165,34 +98,6 @@ class UserController {
     }
   };
 
-  login = async (req, res) => {
-    const { login, password } = req.body;
-  
-    if (!login || !password) {
-      return res.status(400).json({ erro: "Email ou nome de usuário e senha são obrigatórios." });
-    }
-  
-    try {
-      const user = await userModel.getByLogin(login);
-  
-      if (!user) {
-        return res.status(404).json({ erro: "Usuário não encontrado." });
-      }
-  
-      const senhaCorreta = await bcrypt.compare(password, user.password);
-  
-      if (!senhaCorreta) {
-        return res.status(401).json({ erro: "Senha incorreta." });
-      }
-  
-      const token = gerarToken({ id: user.id, userName: user.userName, email: user.email });
-  
-      return res.status(200).json({ token });
-    } catch (error) {
-      console.error("Erro no login:", error.message);
-      return res.status(500).json({ erro: "Erro ao fazer login." });
-    }
-  };
 
 }
 export default new UserController();

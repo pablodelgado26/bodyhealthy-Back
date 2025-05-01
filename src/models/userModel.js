@@ -1,6 +1,7 @@
 import prisma from "../../prisma/client.js";
 
 class UserModel {
+
   getAll = async () => {
     try {
       const users = await prisma.user.findMany({
@@ -45,29 +46,18 @@ class UserModel {
     }
   };
 
-  getByLogin = async (login) => {
-    try {
-      const user = await prisma.user.findFirst({
+  async findByUserNameOrEmail(userName, email) {
+    const user = await prisma.user.findFirst({
         where: {
-          OR: [
-            { email: login },
-            { userName: login },
-          ],
+            OR: [
+                { userName },
+                { email },
+            ],
         },
-        select: {
-          id: true,
-          userName: true,
-          email: true,
-          password: true,
-        },
-      });
-      return user || null;
-    } catch (error) {
-      console.error(`Erro ao buscar usuário com login "${login}":`, error.message);
-      throw error;
-    }
-  };
-  
+    });
+
+    return user;
+}
 
   create = async (data) => {
     try {
@@ -173,5 +163,6 @@ class UserModel {
       throw error;
     }
   };
+
 }
 export default new UserModel();
