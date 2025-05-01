@@ -21,31 +21,31 @@ class AuthController {
                 conditioning,
                 imageProfile,
             } = req.body;
-    
+
             // Validação de campos obrigatórios
-            if (!userName || !email || !password || !cellPhone ) {
+            if (!userName || !email || !password || !cellPhone) {
                 return res.status(400).json({ error: 'Os campos obrigatórios não foram preenchidos.' });
             }
-    
+
             // Verificar se o usuário já existe
             const userExists = await UserModel.findByUserNameOrEmail(email, userName);
             if (userExists) {
                 return res.status(400).json({ error: 'Este email ou nome de usuário já está em uso.' });
             }
-    
+
             // Conversão e validação de tipos
             const parsedCellPhone = parseInt(cellPhone);
             const parsedAge = parseInt(age);
             const parsedHeight = parseFloat(height);
             const parsedWeight = parseFloat(weight);
-    
+
             if (isNaN(parsedCellPhone) || isNaN(parsedAge) || isNaN(parsedHeight) || isNaN(parsedWeight)) {
                 return res.status(400).json({ error: 'Formato inválido para celular, idade, altura ou peso.' });
             }
-    
+
             // Hash da senha
             const hashedPassword = await bcrypt.hash(password, 10);
-    
+
             // Criação do novo usuário
             const data = {
                 userName,
@@ -62,14 +62,14 @@ class AuthController {
                 conditioning,
                 imageProfile,
             };
-    
+
             const newUser = await UserModel.create(data);
-    
+
             // Serializar caso contenha BigInt
             const user = JSON.parse(JSON.stringify(newUser, (_, value) =>
                 typeof value === 'bigint' ? value.toString() : value
             ));
-    
+
             return res.status(201).json({
                 message: 'Usuário criado com sucesso!',
                 user,
@@ -79,29 +79,28 @@ class AuthController {
             return res.status(500).json({ error: 'Erro ao criar novo usuário.' });
         }
     }
-    
 
     async login(req, res) {
         try {
             const { userName, email, password } = req.body;
-    
+
             // Validação básica
             if ((!userName && !email) || !password) {
                 return res.status(400).json({ error: 'Os campos userName, email e senha são obrigatórios.' });
             }
-    
+
             // Verificar se o usuário existe
             const userExists = await UserModel.findByUserNameOrEmail(userName, email);
             if (!userExists) {
                 return res.status(401).json({ error: 'Credenciais inválidas!' });
             }
-    
+
             // Verificar senha
             const isPasswordValid = await bcrypt.compare(password, userExists.password);
             if (!isPasswordValid) {
                 return res.status(401).json({ error: 'Credenciais inválidas!' });
             }
-    
+
             // Gerar token JWT
             const token = jwt.sign(
                 {
@@ -114,12 +113,12 @@ class AuthController {
                     expiresIn: '72h',
                 }
             );
-    
+
             // Serializar caso contenha BigInt
             const user = JSON.parse(JSON.stringify(userExists, (_, value) =>
                 typeof value === 'bigint' ? value.toString() : value
             ));
-    
+
             return res.json({
                 message: 'Login realizado com sucesso!',
                 token,
@@ -130,7 +129,6 @@ class AuthController {
             return res.status(500).json({ message: 'Erro ao fazer login!' });
         }
     }
-    
 
 }
 

@@ -3,20 +3,20 @@ import bcrypt from "bcryptjs";
 
 class UserController {
 
-  getAll = async (req, res) => {
+  async getAll(req, res) {
     try {
       const users = await userModel.getAll();
       if (!users || users.length === 0) {
         return res.status(200).json({ message: 'Nenhum usuário encontrado.' });
       }
-      return res.status(200).json(users);
+      res.json(users);
     } catch (error) {
-      console.error('Erro no controller getAll:', error.message, error.stack);
-      return res.status(500).json({ erro: 'Erro ao buscar usuários.' });
+      console.error('Erro ao buscar todos os usuários:', error);
+      res.status(500).json({ error: 'Erro ao buscar usuários.' });
     }
-  };
+  }
 
-  getByUserName = async (req, res) => {
+  async getByUserName(req, res) {
     const { userName } = req.params;
 
     // Validação básica
@@ -35,14 +35,14 @@ class UserController {
         typeof value === 'bigint' ? value.toString() : value
       ));
 
-      return res.status(200).json(userSerialized);
+      res.status(200).json(userSerialized);
     } catch (error) {
-      console.error(`Erro no controller getByUserName (userName: ${userName}):`, error.message, error.stack);
-      return res.status(500).json({ erro: 'Erro ao buscar usuário.' });
+      console.error(`Erro ao buscar usuário pelo userName (${userName}):`, error.message, error.stack);
+      res.status(500).json({ erro: 'Erro ao buscar usuário.' });
     }
-  };
+  }
 
-  update = async (req, res) => {
+  async update(req, res) {
     const { userName } = req.params;
     const {
       name, password, age, sex, height, weight, descriptionObjective, restriction, conditioning, imageProfile,
@@ -74,17 +74,17 @@ class UserController {
         return res.status(404).json({ erro: 'Usuário não encontrado' });
       }
 
-      return res.status(200).json(userAtualizado);
+      res.status(200).json(userAtualizado);
     } catch (error) {
       console.error(error);
       if (error.code === 'P2025') {
         return res.status(404).json({ erro: 'Usuário não encontrado' });
       }
-      return res.status(500).json({ erro: 'Erro ao atualizar usuário' });
+      res.status(500).json({ erro: 'Erro ao atualizar usuário' });
     }
-  };
+  }
 
-  delete = async (req, res) => {
+  async delete(req, res) {
     const { userName } = req.params;
     try {
       const sucesso = await userModel.delete(userName);
@@ -96,8 +96,7 @@ class UserController {
       console.error(error);
       res.status(500).json({ erro: "Erro ao deletar User" });
     }
-  };
-
+  }
 
 }
 export default new UserController();

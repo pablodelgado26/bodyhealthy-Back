@@ -3,15 +3,15 @@ import postModel from "../models/postModel.js";
 
 class PostController {
 
-  getAll = async (req, res) => {
+  async getAll(req, res) {
     try {
       const posts = await postModel.getAll();
       res.json(posts);
     } catch (error) {
-      console.error("Erro ao buscar todos os posts",error);
-      res.status(500).json({ erro: "Erro ao buscar posts" });
+      console.error("Erro ao buscar todos os posts:", error);
+      res.status(500).json({ error: "Erro ao buscar posts" });
     }
-  };
+  }
 
   async getByPostTitle(req, res) {
     try {
