@@ -30,7 +30,8 @@ model User {
   restriction String?
   conditioning String?
 
-  posts Post[] 
+  posts Post[]
+  comments Comment[] 
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -49,10 +50,30 @@ model Post {
   userName String
   user User @relation(fields: [userName], references: [userName], onDelete: Cascade)
   
+  comments Comment[]
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("posts")
+}
+
+model Comment {
+  id Int @id @default(autoincrement())
+  content String
+  like Int @default(0)
+  response Int @default(0)
+
+  userName String
+  user User @relation(fields: [userName], references: [userName], onDelete: Cascade)
+
+  title String
+  post Post @relation(fields: [title], references: [title], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("comments")
 }
 
 
