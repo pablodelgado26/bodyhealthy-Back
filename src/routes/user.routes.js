@@ -2,12 +2,11 @@ import express from "express";
 import userController from "../controllers/userController.js";
 
 const userRouter = express.Router();
-// Definindo as rotas
 
 // Get buscar todos os usuários
 userRouter.get("/", userController.getAll);
 
-// Get buscar um usuário pelo id
+// Get buscar um usuário pelo userName
 userRouter.get("/:userName", userController.getByUserName);
 
 // Put atualizar um usuário
