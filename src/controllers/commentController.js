@@ -57,27 +57,33 @@ class CommentController {
 
   async likeComment(req, res) {
     try {
-      const { title } = req.params;
+      const { id } = req.params;
   
-      if (!title) {
-        return res.status(400).json({ error: "Título do post é obrigatório" });
+      if (!id) {
+        return res.status(400).json({ error: "ID do comentário é obrigatório" });
       }
   
-      const likedPost = await commentModel.likePost(title);
+      const commentId = parseInt(id);
+      if (isNaN(commentId)) {
+        return res.status(400).json({ error: "ID do comentário deve ser um número válido" });
+      }
   
-      if (!likedPost) {
-        return res.status(404).json({ error: "Post não encontrado" });
+      const likedComment = await commentModel.likePost(commentId);
+  
+      if (!likedComment) {
+        return res.status(404).json({ error: "Comentário não encontrado" });
       }
   
       res.status(200).json({
-        message: "Post curtido com sucesso",
-        likedPost
+        message: "Comentário curtido com sucesso",
+        likedComment
       });
     } catch (error) {
-      console.error("Erro ao curtir postagem:", error);
-      res.status(500).json({ error: "Erro ao curtir postagem" });
+      console.error("Erro ao curtir comentário:", error);
+      res.status(500).json({ error: "Erro ao curtir comentário" });
     }
   }
+  
 
   
 }

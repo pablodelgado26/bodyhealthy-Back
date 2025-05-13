@@ -60,9 +60,9 @@ model Post {
 
 model Comment {
   id Int @id @default(autoincrement())
+  commentId Int @default(autoincrement())
   content String
   like Int @default(0)
-  response String
 
   userName String
   user User @relation(fields: [userName], references: [userName], onDelete: Cascade)
@@ -70,10 +70,27 @@ model Comment {
   title String
   post Post @relation(fields: [title], references: [title], onDelete: Cascade)
 
+  responses Response[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("comments")
+}
+
+model Response {
+  id Int @id @default(autoincrement())
+  content String
+  like Int @default(0)
+
+  commentId Int
+  comment Comment @relation(fields: [id], references: [id], onDelete: Cascade)
+
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("responses")  
 }
 
 

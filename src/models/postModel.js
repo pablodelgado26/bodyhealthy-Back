@@ -18,6 +18,7 @@ class PostModel {
             content: true,
             userName: true,
             id: true,
+            like: true,
           },
         },
       },
