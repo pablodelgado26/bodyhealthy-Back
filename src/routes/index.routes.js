@@ -13,11 +13,11 @@ const router = express.Router()
 
 router.use("/auth", authRouter)
 router.use("/posts", postRouter)
+router.use("/user", userRouter)
 
 // Rotas privadas
 router.use(authMiddleware)
 
-router.use("/user", userRouter)
 router.use("/comment", commentRouter)
 
 export default router

@@ -33,16 +33,16 @@ class CommentModel {
 
 
   async delete(id) {
-    const comment = await this.findById(id);
+    const comment = await prisma.comment.findUnique({
+      where: { id: Number(id) },
+    });
 
     if (!comment) {
       return null;
     }
 
     await prisma.comment.delete({
-      where: {
-        id: Number(id),
-      },
+      where: { id: Number(id) },
     });
 
     return true;
