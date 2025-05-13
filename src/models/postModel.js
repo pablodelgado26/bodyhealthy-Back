@@ -1,7 +1,7 @@
 import prisma from "../../prisma/client.js";
 
 class PostModel {
-  
+
   async getAll() {
     const posts = await prisma.post.findMany({
       orderBy: {
@@ -13,6 +13,13 @@ class PostModel {
             userName: true,
           },
         },
+        comments: {
+          select: {
+            content: true,
+            userName: true,
+            id: true,
+          },
+        },
       },
     });
 
@@ -20,13 +27,19 @@ class PostModel {
 
     return posts;
   }
-  
+
   async getByTitle(title) {
     const post = await prisma.post.findUnique({
       where: { title },
       include: {
         user: {
           select: {
+            userName: true,
+          },
+        },
+        comments: {
+          select: {
+            content: true,
             userName: true,
           },
         },
@@ -59,11 +72,11 @@ class PostModel {
       where: { title: title },
       data: {
         like: {
-          increment: 1, 
+          increment: 1,
         },
       },
     });
-  
+
     return updatedPost;
   }
 
@@ -72,28 +85,28 @@ class PostModel {
       where: { title: title },
       data: {
         comment: {
-          increment: 1, 
+          increment: 1,
         },
       },
     });
-  
+
     return updatedPost;
   }
-  
+
   async update(title, description, imagePost) {
     if (!title) {
       throw new Error('Título é obrigatório para atualizar o post.');
     }
-  
+
     const post = await prisma.post.findUnique({
       where: { title },
       include: { user: { select: { userName: true } } }
     });
-  
+
     if (!post) {
       return null;
     }
-  
+
     const postAtualizado = await prisma.post.update({
       where: { title },
       data: {
@@ -101,10 +114,10 @@ class PostModel {
         imagePost,
       },
     });
-  
+
     return postAtualizado;
   }
-  
+
   async delete(title) {
     const post = await this.getByTitle(title);
     if (!post) {

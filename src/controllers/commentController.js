@@ -2,118 +2,60 @@ import commentModel from "../models/commentModel.js";
 
 
 class CommentController {
-
-  async getAll(req, res) {
-    try {
-      const comments = await commentModel.getAll();
-      res.json(comments);
-    } catch (error) {
-      console.error("Erro ao buscar todos os comentários:", error);
-      res.status(500).json({ error: "Erro ao buscar comentários" });
-    }
-  }
-
-  async getByPostTitle(req, res) {
-    try {
-      const { title } = req.params;
-
-      const titulo = await commentModel.getByTitle(title);
-
-      if (!titulo) {
-        return res.status(404).json({ error: "titulo não encontrada" });
-      }
-
-      res.json(titulo);
-    } catch (error) {
-      console.error("Erro ao buscar postagem pelo titulo:", error);
-      res.status(500).json({ error: "Erro ao buscar postagem pelo titulo" });
-    }
-  }
   
-  async createPost(req, res) {
+  async createComment(req, res) {
     try {
       // Validação básica
       const {
-        title,
-        description,
-        imagePost,
+        content,
         userName,
+        title,
       } = req.body;
-      if (!title || !description || !userName) {
+      if (!content || !userName || !title) {
         return res
           .status(400)
           .json({ error: "Todos os campos são obrigatórios" });
       }
 
-      const newPost = await commentModel.create(
-        title,
-        description,
-        imagePost,
-        userName
+      const newComment = await commentModel.create(
+        content,
+        userName,
+        title
       );
 
-      if (!newPost) {
-        return res.status(400).json({ error: "Erro ao criar Postagem" });
+      if (!newComment) {
+        return res.status(400).json({ error: "Erro ao criar comentário" });
       }
 
       res.status(201).json({
-        message: "Postagem criada com sucesso",
-        newPost
+        message: "Comentário criado com sucesso",
+        newComment
       });
     } catch (error) {
-      console.error("Erro ao criar Postagem:", error);
-      res.status(500).json({ error: "Erro ao criar Postagem" });
+      console.error("Erro ao criar comentário:", error);
+      res.status(500).json({ error: "Erro ao criar comentário" });
     }
   }
   
-  async updatePost(req, res) {
+  async deleteComment(req, res) {
     try {
-      const { title } = req.params;
-      const { description, imagePost } = req.body;
-  
-      if (!title) {
-        return res.status(400).json({ error: "Título é obrigatório." });
-      }
-  
-      const postAtualizado = await commentModel.update(
-        title,
-        description,
-        imagePost
-      );
-  
-      if (!postAtualizado) {
-        return res.status(404).json({ error: "Post não encontrado." });
-      }
-  
-      res.status(200).json({
-        message: "Post atualizado com sucesso.",
-        post: postAtualizado,
-      });
-    } catch (error) {
-      console.error("Erro ao atualizar postagem:", error.message);
-      res.status(500).json({ error: "Erro ao atualizar postagem." });
-    }
-  }
-  
-  async delete(req, res) {
-    try {
-      const { title } = req.params;
+      const { id } = req.params;
 
-      // Remover o carta
-      const result = await commentModel.delete(title);
+      // Remover o coleção
+      const result = await commentModel.delete(id);
 
       if (!result) {
-        return res.status(404).json({ error: "carta não encontrada" });
+        return res.status(404).json({ error: "Comentário não encontrada" });
       }
 
       res.status(204).end(); // Resposta sem conteúdo
     } catch (error) {
-      console.error("Erro ao remover carta:", error);
-      res.status(500).json({ error: "Erro ao remover carta" });
+      console.error("Erro ao remover comentário:", error);
+      res.status(500).json({ error: "Erro ao remover comentário" });
     }
   }
 
-  async likePost(req, res) {
+  async likeComment(req, res) {
     try {
       const { title } = req.params;
   
@@ -137,29 +79,6 @@ class CommentController {
     }
   }
 
-  async commentPost(req, res) {
-    try {
-      const { title } = req.params;
-  
-      if (!title) {
-        return res.status(400).json({ error: "Título do post é obrigatório" });
-      }
-  
-      const commented = await commentModel.commentPost(title);
-  
-      if (!commented) {
-        return res.status(404).json({ error: "Post não encontrado" });
-      }
-  
-      res.status(200).json({
-        message: "Post comentado com sucesso",
-        commented
-      });
-    } catch (error) {
-      console.error("Erro ao comentar postagem:", error);
-      res.status(500).json({ error: "Erro ao comentar na postagem" });
-    }
-  }
   
 }
 export default new CommentController();
