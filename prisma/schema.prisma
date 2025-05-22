@@ -14,24 +14,24 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  userName String @unique
-  name String
-  email String @unique
-  password String
+  id        Int    @id @default(autoincrement())
+  userName  String @unique
+  name      String
+  email     String @unique
+  password  String
   cellPhone BigInt @unique
-  age Int
-  sex String
-  height Float
-  weight Float
+  age       Int
+  sex       String
+  height    Float
+  weight    Float
 
-  imageProfile String?
+  imageProfile         String?
   descriptionObjective String?
-  restriction String?
-  conditioning String?
+  restriction          String?
+  conditioning         String?
 
-  posts Post[]
-  comments Comment[] 
+  posts    Post[]
+  comments Comment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -40,18 +40,18 @@ model User {
 }
 
 model Post {
-  id Int @id @default(autoincrement())
-  title String @unique
+  id          Int     @id @default(autoincrement())
+  title       String  @unique
   description String
-  imagePost String?
-  like Int @default(0)
-  comment Int @default(0)
+  imagePost   String?
+  like        Int     @default(0)
+  comment     Int     @default(0)
 
   userName String
-  user User @relation(fields: [userName], references: [userName], onDelete: Cascade)
-  
+  user     User   @relation(fields: [userName], references: [userName], onDelete: Cascade)
+
   comments Comment[]
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -59,18 +59,15 @@ model Post {
 }
 
 model Comment {
-  id Int @id @default(autoincrement())
-  commentId Int @default(autoincrement())
+  id      Int    @id @default(autoincrement())
   content String
-  like Int @default(0)
+  like    Int    @default(0)
 
   userName String
-  user User @relation(fields: [userName], references: [userName], onDelete: Cascade)
+  user     User   @relation(fields: [userName], references: [userName], onDelete: Cascade)
 
   title String
-  post Post @relation(fields: [title], references: [title], onDelete: Cascade)
-
-  responses Response[]
+  post  Post   @relation(fields: [title], references: [title], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -78,21 +75,31 @@ model Comment {
   @@map("comments")
 }
 
-model Response {
-  id Int @id @default(autoincrement())
-  content String
-  like Int @default(0)
+model Training {
+  id          Int    @id @default(autoincrement())
+  title       String @unique
+  description String
 
-  commentId Int
-  comment Comment @relation(fields: [id], references: [id], onDelete: Cascade)
-
+  exercises Exercise[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("responses")  
+  @@map("trainings")
 }
 
+model Exercise {
+  id          Int    @id @default(autoincrement())
+  title       String @unique
+  MuscleGroup String
+  repetitions Int
+  series      Int
 
-  
-  
+  trainingTitle String
+  training      Training @relation(fields: [trainingTitle], references: [title], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("exercises")
+}
