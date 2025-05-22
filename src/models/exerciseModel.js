@@ -40,71 +40,48 @@ class ExerciseModel {
 
     async create(
         title,
-        description,
-        imagePost,
-        userName,
+        muscleGroup,
+        repetitions,
+        series,
+        training,
     ) {
-        const novoPost = await prisma.exercise.create({
+        const novoExercise = await prisma.exercise.create({
             data: {
                 title,
-                description,
-                imagePost,
-                userName: String(userName),
+                muscleGroup,
+                repetitions,
+                series,
+                training: String(training),
             },
         });
 
-        return novoPost;
+        return novoExercise;
     }
 
-    async likePost(title) {
-        const updatedPost = await prisma.exercise.update({
-            where: { title: title },
-            data: {
-                like: {
-                    increment: 1,
-                },
-            },
-        });
-
-        return updatedPost;
-    }
-
-    async commentPost(title) {
-        const updatedPost = await prisma.exercise.update({
-            where: { title: title },
-            data: {
-                comment: {
-                    increment: 1,
-                },
-            },
-        });
-
-        return updatedPost;
-    }
-
-    async update(title, description, imagePost) {
+    async update(title, muscleGroup, repetitions, series) {
         if (!title) {
             throw new Error('Título é obrigatório para atualizar o exercise.');
         }
 
         const exercise = await prisma.exercise.findUnique({
             where: { title },
-            include: { user: { select: { userName: true } } }
+            include: { training: { select: { title: true } } }
         });
 
         if (!exercise) {
             return null;
         }
 
-        const postAtualizado = await prisma.exercise.update({
+        const ExerciseAtualizado = await prisma.exercise.update({
             where: { title },
             data: {
-                description,
-                imagePost,
+                muscleGroup,
+                repetitions,
+                series,
             },
         });
 
-        return postAtualizado;
+        return ExerciseAtualizado;
     }
 
     async delete(title) {

@@ -6,5 +6,6 @@ const exerciseRoutes = express.Router();
 
 exerciseRoutes.get("/", exerciseController.getAll);
 exerciseRoutes.get("/:title", exerciseController.getByTitle);
+exerciseRoutes.post("/", exerciseController.createExercise)
 
 export default exerciseRoutes;
