@@ -126,13 +126,6 @@ class PostModel {
     }
     await prisma.post.delete({
       where: { title },
-      include: {
-        user: {
-          select: {
-            userName: true,
-          },
-        },
-      },
     });
     return true;
   }

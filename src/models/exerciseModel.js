@@ -91,13 +91,6 @@ class ExerciseModel {
         }
         await prisma.exercise.delete({
             where: { title },
-            include: {
-                user: {
-                    select: {
-                        userName: true,
-                    },
-                },
-            },
         });
         return true;
     }

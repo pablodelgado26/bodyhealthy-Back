@@ -32,6 +32,7 @@ model User {
 
   posts    Post[]
   comments Comment[]
+  trainings Training[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -81,6 +82,9 @@ model Training {
   description String
 
   exercises Exercise[]
+
+  userName   String
+  user       User   @relation(fields: [userName], references: [userName], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
