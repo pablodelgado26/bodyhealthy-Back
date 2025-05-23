@@ -16,6 +16,11 @@ class TrainingModel {
                         series: true,
                     },
                 },
+                user: {
+                    select: {
+                        userName: true,
+                    },
+                },
             },
         });
 
@@ -34,6 +39,11 @@ class TrainingModel {
                         muscleGroup: true,
                         repetitions: true,
                         series: true,
+                    },
+                },
+                user: {
+                    select: {
+                        userName: true,
                     },
                 },
             },

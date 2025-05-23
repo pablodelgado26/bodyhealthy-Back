@@ -39,8 +39,9 @@ class ExerciseController {
                 repetitions,
                 series,
                 training,
+                userName
             } = req.body;
-            if (!title || !muscleGroup || !repetitions || !series || !training) {
+            if (!title || !muscleGroup || !repetitions || !series || !training || !userName) {
                 return res
                     .status(400)
                     .json({ error: "Todos os campos são obrigatórios" });
@@ -51,7 +52,8 @@ class ExerciseController {
                 muscleGroup,
                 repetitions,
                 series,
-                training
+                training,
+                userName
             );
 
             if (!newExercise) {
@@ -101,18 +103,17 @@ class ExerciseController {
     async delete(req, res) {
         try {
             const { title } = req.params;
-
-            // Remover o carta
+            
             const result = await exerciseModel.delete(title);
 
             if (!result) {
-                return res.status(404).json({ error: "carta não encontrada" });
+                return res.status(404).json({ error: "Exercício não encontrado" });
             }
 
             res.status(204).end(); // Resposta sem conteúdo
         } catch (error) {
-            console.error("Erro ao remover carta:", error);
-            res.status(500).json({ error: "Erro ao remover carta" });
+            console.error("Erro ao remover exercício:", error);
+            res.status(500).json({ error: "Erro ao remover exercício" });
         }
     }
 

@@ -14,6 +14,11 @@ class UserModel {
               title: true,
             },
           },
+          trainings: {
+            select: {
+              title: true,
+            },
+          },
         },
       });
 
@@ -35,6 +40,11 @@ class UserModel {
         where: { userName },
         include: {
           posts: {
+            select: {
+              title: true,
+            },
+          },
+          trainings: {
             select: {
               title: true,
             },
