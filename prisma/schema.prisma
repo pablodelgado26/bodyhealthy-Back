@@ -30,10 +30,9 @@ model User {
   restriction          String?
   conditioning         String?
 
-  posts    Post[]
-  comments Comment[]
+  posts     Post[]
+  comments  Comment[]
   trainings Training[]
-  exercises Exercise[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -84,8 +83,8 @@ model Training {
 
   exercises Exercise[]
 
-  userName   String
-  user       User   @relation(fields: [userName], references: [userName], onDelete: Cascade)
+  userName String
+  user     User   @relation(fields: [userName], references: [userName], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -99,9 +98,6 @@ model Exercise {
   muscleGroup String
   repetitions Int
   series      Int
-
-    userName   String
-  user       User   @relation(fields: [userName], references: [userName], onDelete: Cascade)
 
   trainingTitle String
   training      Training @relation(fields: [trainingTitle], references: [title], onDelete: Cascade)

@@ -44,7 +44,6 @@ class ExerciseModel {
         repetitions,
         series,
         training,
-        userName,
     ) {
         const novoExercise = await prisma.exercise.create({
             data: {
@@ -52,7 +51,6 @@ class ExerciseModel {
                 muscleGroup,
                 repetitions,
                 series,
-                userName: String(userName),
                 training: {
                     connect: {
                         title: training,
