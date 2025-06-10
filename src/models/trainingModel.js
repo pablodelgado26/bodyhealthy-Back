@@ -5,22 +5,22 @@ class TrainingModel {
     async getAll() {
         const trainings = await prisma.training.findMany({
             orderBy: {
-                title: 'desc',
+            createdAt: 'asc',
             },
             include: {
-                exercises: {
-                    select: {
-                        title: true,
-                        muscleGroup: true,
-                        repetitions: true,
-                        series: true,
-                    },
+            exercises: {
+                select: {
+                title: true,
+                muscleGroup: true,
+                repetitions: true,
+                series: true,
                 },
-                user: {
-                    select: {
-                        userName: true,
-                    },
+            },
+            user: {
+                select: {
+                userName: true,
                 },
+            },
             },
         });
 
@@ -29,9 +29,12 @@ class TrainingModel {
         return trainings;
     }
 
-    async getByTitle(title) {
-        const training = await prisma.training.findUnique({
-            where: { title },
+    async getByUser(userName) {
+        const trainings = await prisma.training.findMany({
+            where: { userName },
+            orderBy: {
+                title: 'asc',
+            },
             include: {
                 exercises: {
                     select: {
@@ -49,7 +52,7 @@ class TrainingModel {
             },
         });
 
-        return training;
+        return trainings;
     }
 
     async create(
@@ -69,71 +72,71 @@ class TrainingModel {
     }
 
     async update(userName, title, description) {
-    if (!title) {
-        throw new Error('Título é obrigatório para atualizar o training.');
+        if (!title) {
+            throw new Error('Título é obrigatório para atualizar o training.');
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { userName },
+        });
+
+        if (!user) {
+            throw new Error('Usuário não encontrado.');
+        }
+
+        const training = await prisma.training.findUnique({
+            where: { title },
+        });
+
+        if (!training) {
+            throw new Error('Training não encontrado.');
+        }
+
+        if (training.userName !== user.userName) {
+            throw new Error('Este training não pertence a este usuário.');
+        }
+
+        const trainingAtualizado = await prisma.training.update({
+            where: { title }, // Pode usar title por ser único
+            data: {
+                description,
+            },
+        });
+
+        return trainingAtualizado;
     }
 
-    const user = await prisma.user.findUnique({
-        where: { userName },
-    });
+    async delete(userName, title) {
+        // Busca o usuário pelo userName
+        const user = await prisma.user.findUnique({
+            where: { userName },
+        });
 
-    if (!user) {
-        throw new Error('Usuário não encontrado.');
+        if (!user) {
+            throw new Error('Usuário não encontrado.');
+        }
+
+        // Busca o training pelo título
+        const training = await prisma.training.findUnique({
+            where: { title },
+        });
+
+        if (!training) {
+            throw new Error('Training não encontrado.');
+        }
+
+        // Valida se o treino pertence ao usuário
+        if (training.userName !== user.userName) {
+            throw new Error('Este training não pertence a este usuário.');
+        }
+
+        // Deleta o training
+        await prisma.training.delete({
+            where: { title }, // Usando title por ser único
+        });
+
+        return true;
     }
-
-    const training = await prisma.training.findUnique({
-        where: { title },
-    });
-
-    if (!training) {
-        throw new Error('Training não encontrado.');
-    }
-
-    if (training.userName !== user.userName) {
-        throw new Error('Este training não pertence a este usuário.');
-    }
-
-    const trainingAtualizado = await prisma.training.update({
-        where: { title }, // Pode usar title por ser único
-        data: {
-            description,
-        },
-    });
-
-    return trainingAtualizado;
-}
-
-async delete(userName, title) {
-    // Busca o usuário pelo userName
-    const user = await prisma.user.findUnique({
-        where: { userName },
-    });
-
-    if (!user) {
-        throw new Error('Usuário não encontrado.');
-    }
-
-    // Busca o training pelo título
-    const training = await prisma.training.findUnique({
-        where: { title },
-    });
-
-    if (!training) {
-        throw new Error('Training não encontrado.');
-    }
-
-    // Valida se o treino pertence ao usuário
-    if (training.userName !== user.userName) {
-        throw new Error('Este training não pertence a este usuário.');
-    }
-
-    // Deleta o training
-    await prisma.training.delete({
-        where: { title }, // Usando title por ser único
-    });
-
-    return true;
-}
 
 }
 export default new TrainingModel();

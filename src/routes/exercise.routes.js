@@ -6,7 +6,7 @@ import e from 'express';
 const exerciseRoutes = express.Router();
 
 exerciseRoutes.get("/", exerciseController.getAll);
-exerciseRoutes.get("/:title", exerciseController.getByTitle);
+exerciseRoutes.get("/:userName/:title", exerciseController.getByTitle);
 exerciseRoutes.post("/", exerciseController.createExercise)
 exerciseRoutes.delete("/:title", exerciseController.delete);
 

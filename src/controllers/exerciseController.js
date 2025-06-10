@@ -15,15 +15,15 @@ class ExerciseController {
 
     async getByTitle(req, res) {
         try {
-            const { title } = req.params;
+            const { title, userName } = req.params;
 
-            const titulo = await exerciseModel.getByTitle(title);
+            const exercise = await exerciseModel.getByTitleAndUserName(title, userName);
 
-            if (!titulo) {
-                return res.status(404).json({ error: "Exercício não encontrada" });
+            if (!exercise) {
+                return res.status(404).json({ error: "Exercício não encontrado" });
             }
 
-            res.json(titulo);
+            res.json(exercise);
         } catch (error) {
             console.error("Erro ao buscar Exercício:", error);
             res.status(500).json({ error: "Erro ao buscar Exercício" });
@@ -32,15 +32,17 @@ class ExerciseController {
 
     async createExercise(req, res) {
         try {
-            // Validação básica
             const {
                 title,
                 muscleGroup,
                 repetitions,
                 series,
+                imageExercise,
+                description,
+                userName,
                 training,
             } = req.body;
-            if (!title || !muscleGroup || !repetitions || !series || !training) {
+            if (!title || !muscleGroup || !repetitions || !series || !imageExercise ||!userName || !description || !training) {
                 return res
                     .status(400)
                     .json({ error: "Todos os campos são obrigatórios" });
@@ -51,6 +53,9 @@ class ExerciseController {
                 muscleGroup,
                 repetitions,
                 series,
+                imageExercise,
+                description,
+                userName,
                 training,
             );
 

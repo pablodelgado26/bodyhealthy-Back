@@ -6,7 +6,7 @@ import trainingController from '../controllers/trainingController.js';
 const trainingRoutes = express.Router();
 
 trainingRoutes.get("/", trainingController.getAll);
-trainingRoutes.get("/:title", trainingController.getByTitle);
+trainingRoutes.get("/:userName", trainingController.getByUser);
 trainingRoutes.post("/", trainingController.createTraining)
 trainingRoutes.put("/:userName/:title", trainingController.updateTraining);
 trainingRoutes.delete("/:userName/:title", trainingController.deleteTraining)

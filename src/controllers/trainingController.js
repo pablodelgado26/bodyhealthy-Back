@@ -13,20 +13,20 @@ class TrainingController {
         }
     }
 
-    async getByTitle(req, res) {
+    async getByUser(req, res) {
         try {
-            const { title } = req.params;
+            const { userName } = req.params;
 
-            const titulo = await trainingModel.getByTitle(title);
+            const trainings = await trainingModel.getByUser(userName);
 
-            if (!titulo) {
-                return res.status(404).json({ error: "Treino não encontrada" });
+            if (!trainings || trainings.length === 0) {
+                return res.status(404).json({ error: "Nenhum treino encontrado para este usuário" });
             }
 
-            res.json(titulo);
+            res.json(trainings);
         } catch (error) {
-            console.error("Erro ao buscar Treino:", error);
-            res.status(500).json({ error: "Erro ao buscar Treino" });
+            console.error("Erro ao buscar Treinos por usuário:", error);
+            res.status(500).json({ error: "Erro ao buscar Treinos por usuário" });
         }
     }
 

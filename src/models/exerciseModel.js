@@ -14,6 +14,11 @@ class ExerciseModel {
                         description: true,
                     },
                 },
+                user: {
+                    select: {
+                        userName: true,
+                    },
+                },
             },
         });
 
@@ -22,19 +27,18 @@ class ExerciseModel {
         return exercises;
     }
 
-    async getByTitle(title) {
-        const exercise = await prisma.exercise.findUnique({
-            where: { title },
-            include: {
-                training: {
-                    select: {
-                        title: true,
-                        description: true,
-                    },
+    async getByTitleAndUserName(title, userName) {
+        const exercise = await prisma.exercise.findMany({
+            where: {
+                user: {
+                    userName,
                 },
+                training: {
+                    title,
+                },
+
             },
         });
-
         return exercise;
     }
 
@@ -43,6 +47,9 @@ class ExerciseModel {
         muscleGroup,
         repetitions,
         series,
+        imageExercise,
+        description,
+        userName,
         training,
     ) {
         const novoExercise = await prisma.exercise.create({
@@ -51,6 +58,13 @@ class ExerciseModel {
                 muscleGroup,
                 repetitions,
                 series,
+                imageExercise,
+                description,
+                user: {
+                    connect: {
+                        userName,
+                    },
+                },
                 training: {
                     connect: {
                         title: training,
@@ -60,32 +74,6 @@ class ExerciseModel {
         });
 
         return novoExercise;
-    }
-
-    async update(title, muscleGroup, repetitions, series) {
-        if (!title) {
-            throw new Error('Título é obrigatório para atualizar o exercise.');
-        }
-
-        const exercise = await prisma.exercise.findUnique({
-            where: { title },
-            include: { training: { select: { title: true } } }
-        });
-
-        if (!exercise) {
-            return null;
-        }
-
-        const ExerciseAtualizado = await prisma.exercise.update({
-            where: { title },
-            data: {
-                muscleGroup,
-                repetitions,
-                series,
-            },
-        });
-
-        return ExerciseAtualizado;
     }
 
     async delete(title) {
