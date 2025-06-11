@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -35,8 +35,8 @@ model User {
   trainings Training[]
   Exercise  Exercise[]
 
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("users")
 }
@@ -94,13 +94,13 @@ model Training {
 }
 
 model Exercise {
-  id            Int    @id @default(autoincrement())
-  title         String @unique
+  id            Int     @id @default(autoincrement())
+  title         String  @unique
   muscleGroup   String
   repetitions   Int
   series        Int
   imageExercise String
-  description String?
+  description   String?
 
   trainingTitle String
   training      Training @relation(fields: [trainingTitle], references: [title], onDelete: Cascade)
