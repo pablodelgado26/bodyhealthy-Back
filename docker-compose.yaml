@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: bodyhealthy_app
+    restart: unless-stopped
+    ports:
+      - "4106:4106"
+    environment:
+      - PORT=4106
+      - DATABASE_URL=file:/app/data/bodyhealthy.db
+      - JWT_SECRET=bodyhealthy_jwt_secret_2025_super_secure_key
+    volumes:
+      - bodyhealthy_data:/app/data
+
+volumes:
+  bodyhealthy_data:
+    driver: local
